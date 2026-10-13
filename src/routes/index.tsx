@@ -11,6 +11,7 @@ import sponsorRoastly from "@/assets/sponsors/sponsor_roastly.jpg";
 import sponsorOhoride from "@/assets/sponsors/sponsor_ohoride_trans.png";
 import sponsorNalco from "@/assets/sponsors/sponsor_nalco_trans.png";
 import sponsorSureSuccess from "@/assets/sponsors/sponsor_suresuccess_trans.png";
+import sponsorDbMedicare from "@/assets/sponsors/sponsor_dbmedicare_trans.png";
 import { GoldenConfettiBurst, playLaunchAudio } from "@/components/LaunchCeremony";
 
 export const Route = createFileRoute("/")({
@@ -165,6 +166,9 @@ function SponsorsTrack() {
         </div>
         <div className="sponsor-card">
           <img src={sponsorTvs} alt="Balasore TVS" className="sponsor-img" />
+        </div>
+        <div className="sponsor-card">
+          <img src={sponsorDbMedicare} alt="DB MediCare - A Bond Beyond Prescription" className="sponsor-img" />
         </div>
         <div className="sponsor-card">
           <img src={sponsorRoastly} alt="Roastly" className="sponsor-img" />

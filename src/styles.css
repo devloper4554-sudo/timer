@@ -797,7 +797,7 @@ body,
   align-items: center;
   gap: clamp(6px, 1vh, 12px);
   width: 100%;
-  max-width: min(880px, 86vw);
+  max-width: min(1020px, 92vw);
   margin: 0 auto;
   z-index: 2;
 }
