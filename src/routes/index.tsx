@@ -14,6 +14,7 @@ import sponsorSureSuccess from "@/assets/sponsors/sponsor_suresuccess_trans.png"
 import sponsorDbMedicare from "@/assets/sponsors/sponsor_dbmedicare_trans.png";
 import { GoldenConfettiBurst, playLaunchAudio } from "@/components/LaunchCeremony";
 import { usePersistentTimer } from "@/hooks/usePersistentTimer";
+import { RestartDropdown } from "@/components/RestartDropdown";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -251,6 +252,30 @@ function Index() {
     resetTimer();
   }, [soundEnabled, resetTimer]);
 
+  const handleRestartVoyageFromDropdown = useCallback(
+    (seconds: number = 24 * 3600) => {
+      if (soundEnabled) playLaunchAudio("fanfare");
+      setShowConfetti(true);
+      startTimer(seconds);
+      setViewMode("main");
+      setTimeout(() => setShowConfetti(false), 4500);
+    },
+    [soundEnabled, startTimer, setViewMode],
+  );
+
+  const handleResetStandbyFromDropdown = useCallback(
+    (seconds: number = 24 * 3600) => {
+      if (soundEnabled) playLaunchAudio("click");
+      resetTimer(seconds, "main");
+    },
+    [soundEnabled, resetTimer],
+  );
+
+  const handleReturnToLaunchFromDropdown = useCallback(() => {
+    if (soundEnabled) playLaunchAudio("click");
+    resetTimer(24 * 3600, "launch");
+  }, [soundEnabled, resetTimer]);
+
   useEffect(() => {
     const handleFullscreenChange = () => {
       const active = Boolean(document.fullscreenElement);
@@ -294,7 +319,7 @@ function Index() {
       document.removeEventListener("webkitfullscreenchange", handleFullscreenChange);
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [toggleMaximize, handleStartVoyage, handleTogglePlay, handleReset, viewMode, isMaximized]);
+  }, [toggleMaximize, handleStartVoyage, handleTogglePlay, handleReset, viewMode, isMaximized, setViewMode]);
 
   const handleHeroDoubleClick = (e: React.MouseEvent) => {
     const tag = (e.target as HTMLElement)?.tagName;
@@ -342,17 +367,26 @@ function Index() {
 
             <div className="hero-flank hero-flank-right">
               {!isExpanded && (
-                <button
-                  type="button"
-                  onClick={toggleMaximize}
-                  className="maximize-btn"
-                  aria-label="Maximize to Full Screen (Press F or M)"
-                  title="Maximize to Full Screen (Press F or M)"
-                >
-                  <Maximize aria-hidden="true" className="maximize-icon" />
-                  <span className="maximize-label">Maximize</span>
-                  <kbd className="maximize-kbd">F</kbd>
-                </button>
+                <div className="hero-flank-controls">
+                  <RestartDropdown
+                    isRunning={isRunning}
+                    remaining={remaining}
+                    onRestartVoyage={handleRestartVoyageFromDropdown}
+                    onResetStandby={handleResetStandbyFromDropdown}
+                    onReturnToLaunch={handleReturnToLaunchFromDropdown}
+                  />
+                  <button
+                    type="button"
+                    onClick={toggleMaximize}
+                    className="maximize-btn"
+                    aria-label="Maximize to Full Screen (Press F or M)"
+                    title="Maximize to Full Screen (Press F or M)"
+                  >
+                    <Maximize aria-hidden="true" className="maximize-icon" />
+                    <span className="maximize-label">Maximize</span>
+                    <kbd className="maximize-kbd">F</kbd>
+                  </button>
+                </div>
               )}
               <img className="hero-falcon-logo" src={falconLogo} alt="Falcon logo" />
             </div>
@@ -442,20 +476,29 @@ function Index() {
               </div>
             </div>
 
-            {/* Right Flank: Falcon Emblem + Maximize Control */}
+            {/* Right Flank: Controls (Restart Dropdown + Maximize) + Falcon Emblem */}
             <div className="hero-flank hero-flank-right">
               {!isExpanded && (
-                <button
-                  type="button"
-                  onClick={toggleMaximize}
-                  className="maximize-btn"
-                  aria-label="Maximize to Full Screen (Press F or M)"
-                  title="Maximize to Full Screen (Press F or M)"
-                >
-                  <Maximize aria-hidden="true" className="maximize-icon" />
-                  <span className="maximize-label">Maximize</span>
-                  <kbd className="maximize-kbd">F</kbd>
-                </button>
+                <div className="hero-flank-controls">
+                  <RestartDropdown
+                    isRunning={isRunning}
+                    remaining={remaining}
+                    onRestartVoyage={handleRestartVoyageFromDropdown}
+                    onResetStandby={handleResetStandbyFromDropdown}
+                    onReturnToLaunch={handleReturnToLaunchFromDropdown}
+                  />
+                  <button
+                    type="button"
+                    onClick={toggleMaximize}
+                    className="maximize-btn"
+                    aria-label="Maximize to Full Screen (Press F or M)"
+                    title="Maximize to Full Screen (Press F or M)"
+                  >
+                    <Maximize aria-hidden="true" className="maximize-icon" />
+                    <span className="maximize-label">Maximize</span>
+                    <kbd className="maximize-kbd">F</kbd>
+                  </button>
+                </div>
               )}
               <img className="hero-falcon-logo" src={falconLogo} alt="Falcon logo" />
             </div>

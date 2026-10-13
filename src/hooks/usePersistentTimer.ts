@@ -150,16 +150,16 @@ export function usePersistentTimer() {
   }, [applyState]);
 
   // Actions
-  const handleStartVoyage = useCallback(() => {
+  const handleStartVoyage = useCallback((durationSeconds: number = TOTAL_SECONDS) => {
     const now = Date.now();
-    const target = now + TOTAL_SECONDS * 1000;
+    const target = now + durationSeconds * 1000;
     const newState: TimerPersistedState = {
       isRunning: true,
       viewMode: "main",
       startTime: now,
       targetEndTime: target,
-      remainingSeconds: TOTAL_SECONDS,
-      totalSeconds: TOTAL_SECONDS,
+      remainingSeconds: durationSeconds,
+      totalSeconds: durationSeconds,
       updatedAt: now,
     };
     writeLocalState(newState);
@@ -203,21 +203,24 @@ export function usePersistentTimer() {
     }
   }, [remaining, applyState]);
 
-  const handleReset = useCallback(() => {
-    const now = Date.now();
-    const resetState: TimerPersistedState = {
-      isRunning: false,
-      viewMode: "launch",
-      startTime: null,
-      targetEndTime: null,
-      remainingSeconds: TOTAL_SECONDS,
-      totalSeconds: TOTAL_SECONDS,
-      updatedAt: now,
-    };
-    writeLocalState(resetState);
-    applyState(resetState);
-    updateServerTimerState({ data: resetState }).catch(() => {});
-  }, [applyState]);
+  const handleReset = useCallback(
+    (durationSeconds: number = TOTAL_SECONDS, targetViewMode: "launch" | "main" = "launch") => {
+      const now = Date.now();
+      const resetState: TimerPersistedState = {
+        isRunning: false,
+        viewMode: targetViewMode,
+        startTime: null,
+        targetEndTime: null,
+        remainingSeconds: durationSeconds,
+        totalSeconds: durationSeconds,
+        updatedAt: now,
+      };
+      writeLocalState(resetState);
+      applyState(resetState);
+      updateServerTimerState({ data: resetState }).catch(() => {});
+    },
+    [applyState],
+  );
 
   const setViewMode = useCallback(
     (mode: "launch" | "main" | ((prev: "launch" | "main") => "launch" | "main")) => {
