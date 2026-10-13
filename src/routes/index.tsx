@@ -13,6 +13,7 @@ import sponsorNalco from "@/assets/sponsors/sponsor_nalco_trans.png";
 import sponsorSureSuccess from "@/assets/sponsors/sponsor_suresuccess_trans.png";
 import sponsorDbMedicare from "@/assets/sponsors/sponsor_dbmedicare_trans.png";
 import { GoldenConfettiBurst, playLaunchAudio } from "@/components/LaunchCeremony";
+import { usePersistentTimer } from "@/hooks/usePersistentTimer";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -187,33 +188,21 @@ function SponsorsTrack() {
   );
 }
 
-const TOTAL_SECONDS = 24 * 60 * 60;
-
 function Index() {
-  const [viewMode, setViewMode] = useState<"launch" | "main">("launch");
-  const [remaining, setRemaining] = useState(TOTAL_SECONDS);
-  const [isRunning, setIsRunning] = useState(false);
+  const {
+    viewMode,
+    remaining,
+    isRunning,
+    setViewMode,
+    handleStartVoyage: startTimer,
+    handleTogglePlay: toggleTimer,
+    handleReset: resetTimer,
+  } = usePersistentTimer();
+
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [showConfetti, setShowConfetti] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isMaximized, setIsMaximized] = useState(false);
-
-  // Timer Tick Interval
-  useEffect(() => {
-    if (!isRunning) return;
-
-    const interval = window.setInterval(() => {
-      setRemaining((prev) => {
-        if (prev <= 1) {
-          setIsRunning(false);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
-    return () => window.clearInterval(interval);
-  }, [isRunning]);
 
   const toggleMaximize = useCallback(async () => {
     const shouldMaximize = !isFullscreen && !isMaximized;
@@ -244,25 +233,23 @@ function Index() {
   }, [isFullscreen, isMaximized]);
 
   // When clicking START on the Launching Page:
-  // Directly opens the Main Page and starts the countdown timer!
+  // Directly opens the Main Page and starts the countdown timer with persistence!
   const handleStartVoyage = useCallback(() => {
     if (soundEnabled) playLaunchAudio("fanfare");
     setShowConfetti(true);
-    setIsRunning(true);
-    setViewMode("main");
+    startTimer();
     setTimeout(() => setShowConfetti(false), 4500);
-  }, [soundEnabled]);
+  }, [soundEnabled, startTimer]);
 
   const handleTogglePlay = useCallback(() => {
     if (soundEnabled) playLaunchAudio("click");
-    setIsRunning((prev) => !prev);
-  }, [soundEnabled]);
+    toggleTimer();
+  }, [soundEnabled, toggleTimer]);
 
   const handleReset = useCallback(() => {
     if (soundEnabled) playLaunchAudio("click");
-    setIsRunning(false);
-    setRemaining(TOTAL_SECONDS);
-  }, [soundEnabled]);
+    resetTimer();
+  }, [soundEnabled, resetTimer]);
 
   useEffect(() => {
     const handleFullscreenChange = () => {
